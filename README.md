@@ -76,9 +76,8 @@ If you have a different setup then you will have to change the BusID in nvidia-x
 
 ### NOTE
 You have to modify the BusID like this (preferably before installing nvidia-xswitch):
-
-if the output of: lspci | grep -i nvidia | awk '{print $1}' is 01:00.0, then in nvidia-xswitch.conf you have to write it as: 01:00:0 (01:00.0 turns into 01:00:0).
-
+if the output of: lspci | grep -i nvidia | awk '{print $1}' is 01:00.0, then in nvidia-xswitch.conf you have to write it as: 01:00:0
+so basically 01:00.0 turns into 01:00:0
 If you want to modify BusID after installing nvidia-xswitch, then you have to change it directly in $HOME/.X11/nvidia-xswitch.conf.
 
 
@@ -86,21 +85,23 @@ If you want to modify BusID after installing nvidia-xswitch, then you have to ch
 ### Useful tips:
 If you are on a laptop and want a better touchpad experience, then uncomment the following section in nvidia-xswitch.conf (this enables tap-to-click):
  #Section "InputClass"
- #    Identifier "libinput touchpad catchall"
- #    MatchIsTouchpad "on"
- #    MatchDevicePath "/dev/input/event*"
- #    Driver "libinput"
- #    Option "Tapping" "on"
- #EndSection
+ 
+    #    Identifier "libinput touchpad catchall"
+    #    MatchIsTouchpad "on"
+    #    MatchDevicePath "/dev/input/event*"
+    #    Driver "libinput"
+    #    Option "Tapping" "on"
+    #EndSection
 
 In order to quickly terminate the currently running xserver with nvidia-xswitch (if not already used), uncomment the keyboard config section in nvidia-xswitch.conf (this sets the key combination Ctrl+Alt+Backspace to terminate the xserver):
- #Section "InputClass"
- #    Identifier "system-keyboard"
- #    MatchIsKeyboard "on"
- #    Option     "XkbModel" "pc104"
- #    Option     "XkbLayout" "us"
- #    Option     "XkbOptions" "terminate:ctrl_alt_bksp"
- #EndSection
+
+    #Section "InputClass"
+    #    Identifier "system-keyboard"
+    #    MatchIsKeyboard "on"
+    #    Option     "XkbModel" "pc104"
+    #    Option     "XkbLayout" "us"
+    #    Option     "XkbOptions" "terminate:ctrl_alt_bksp"
+    #EndSection
 
 ### NOTE:
 You have to uncomment the chosen sections before installing nvidia-xswitch.
