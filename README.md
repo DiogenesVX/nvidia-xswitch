@@ -76,7 +76,9 @@ If you have a different setup then you will have to change the BusID in nvidia-x
 
 ### NOTE
 You have to modify the BusID like this (preferably before installing nvidia-xswitch):
+
 if the output of: lspci | grep -i nvidia | awk '{print $1}' is 01:00.0, then in nvidia-xswitch.conf you have to write it as: 01:00:0 (01:00.0 turns into 01:00:0).
+
 If you want to modify BusID after installing nvidia-xswitch, then you have to change it directly in $HOME/.X11/nvidia-xswitch.conf.
 
 
