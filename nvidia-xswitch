@@ -1,0 +1,135 @@
+#!/bin/bash
+
+# check if nvidia-xswitch is installed
+if [ ! -f $HOME/.X11/nvidia-xswitch ] && [ "$1" != "--install" ]; then
+    echo "Looks like nvidia-xswitch is not installed, to install it, run: ./nvidia-xswitch --install"
+    exit 1
+elif [ "$1" == "--install" ] && [ -f $HOME/.X11/nvidia-xswitch ]; then
+    echo "Nvidia-xswitch has already been installed!"
+    exit 1
+elif [ "$1" == "--remove" ] && [ ! -f $HOME/.X11/nvidia-xswitch ]; then
+    echo "Nvidia-xswitch has already been removed!"
+    exit 1
+elif [ -f $HOME/.X11/nvidia-xswitch ]; then
+    echo "Found nvidia-xswitch in $HOME/.X11"
+fi
+# warns the user about switching to TTY before running the appliction
+function switch_to_tty() {
+    echo "Looks like you forgot to switch to a TTY! 
+    (1) Press Alt+Ctrl+F1
+    (2) type in your username and hit ENTER
+    (3) type in your password and hit ENTER
+    (4) type in: nvidia-xswitch --help and hit ENTER"
+}
+# runs the --help option but only if the user has switched to TTY
+function printHelp() {
+    echo "The following optins are avalable:
+    --run
+        Run a specific application with the discrete Nvidia card (e.g. nvidia-xswitch --run glxgears).
+    --install
+        Install nvidia-xswitch and set the nvironment variables (nvidia-xswitch --install).
+    --remove
+        Remove nvidia-xswitch and all it's files (nvidia-xswitch --remove)."
+    exit 0
+}
+# runs the nvidia-xswitch --run appname but only if the user has switched to TTY, otherwise the error shows up
+function printRun() {
+    if [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) == "x11" ]; then
+        switch_to_tty
+        exit 1
+    elif [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) != "x11" ] && [ -z "$ARGapp"  ]; then
+        echo "Error! '--run' expects an application name, no application name provided, please enter an application name (e.g. nvidia-xswitch --run glxgears)"
+        exit 1
+    else
+        echo "Preparing to run '$ARGapp'"
+        NVXXSWINIT="xinit $HOME/.X11/nvidia-xinitrc"
+        NVXSWCONF="-- :1 vt'$XDG_VTNR' -nolisten tcp -br -config $HOME/.X11/nvidia-xswitch.conf -configdir /etc/X11/xorg.conf.d"
+        eval "$NVXXSWINIT" \"$ARGapp\" "$NVXSWCONF" # runs the given command
+    fi
+   exit 0
+}
+# runs the --install function
+function printInstall() {
+    echo "export PATH=$HOME/.X11:$PATH" >> $HOME/.profile
+    echo "export PATH=$HOME/.X11:$PATH" >> $HOME/.bashrc
+    mkdir -p $HOME/.X11
+    cp nvidia* $HOME/.X11
+    echo "Nvidia-xswitch has been successfully installed!
+    To run an application with Nvidia card, follow the steps described below:
+    (1) Press Alt+Ctrl+F1
+    (2) type in your username and hit ENTER
+    (3) type in your password and hit ENTER
+    (4) type in: nvidia-xswitch --run application
+    examples:
+    nvidia-xswitch --run glxgears
+    nvidia-xswitch --run nvidia-settings"
+    exit 0
+}
+# removes nvidia-xswitch
+function printRemove() {
+    sed -i "/\("\.X11:"\)/d" $HOME/.profile # removes the export path line from .profile
+    sed -i "/\("\.X11:"\)/d" $HOME/.bashrc # removes the export path line from .bashrc
+    rm -r $HOME/.X11
+    echo "Nvidia-xswitch has been successfully removed!"
+    exit 0
+}
+# only --help --install and --remove options are allowed from the X11 session
+# if --install is given
+if [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) == "x11" ] && [ "$1" == "--install" ]; then
+    echo "Preparing to install nvidia-xswitch, please wait ..."
+    printInstall
+fi
+# if --remove is given
+if [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) == "x11" ] && [ "$1" == "--remove" ]; then
+    echo "Preparing to remove nvidia-xswitch ..."
+    printRemove
+fi
+# if --help is given
+if [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) == "x11" ] && [ "$1" == "--help" ]; then
+    echo "Only removing is allowed on X11 session:
+    --remove
+        Remove nvidia-xswitch and all it's files (nvidia-xswitch --remove).
+    To run an application with Nvidia card, follow the steps described below:
+    (1) Press Alt+Ctrl+F1
+    (2) type in your username and hit ENTER
+    (3) type in your password and hit ENTER
+    (4) type in: nvidia-xswitch --run application
+    examples:
+    nvidia-xswitch --run glxgears
+    nvidia-xswitch --run nvidia-settings"
+    exit 0
+fi
+# check if the user is trying to run the application from the X11 session
+if [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) == "x11" ]; then
+    switch_to_tty
+    exit 1
+fi
+# if no arguments passed to nvidia-xswitch
+if [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) != "x11" ] && [ -z "$1" ]; then
+    echo "Type in nvidia-xswitch --help to see all the available options."
+    exit 1
+fi
+# if wrong arguments passed to nvidia-xswitch
+if [ $(printenv | grep "XDG_SESSION_TYPE=" | tail -c4) != "x11" ] && [ "$1" != "--run" ] && [ "$1" != "--help" ] && [ "$1" != "--install" ] && [ "$1" != "--remove" ]; then
+    echo "Wrong first argument! Type in nvidia-xswitch --help to see all the available options."
+    exit 1
+fi
+# defines the actions for each option
+case "$1" in
+    "--help")
+        printHelp
+        ;;
+    "--run")
+        export DISPLAY=:1
+        export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json
+        export LD_LIBRARY_PATH=/usr/lib/nvidia/:/usr/lib/nvidia/current/:/usr/lib/x86_64-linux-gnu/nvidia/:/usr/lib/x86_64-linux-gnu/nvidia/current/:/usr/lib/x86_64-linux-gnu:/usr/lib
+        export ARGapp="${@:2}"
+        printRun
+        ;;
+    "--install")
+        printInstall
+        ;;
+    "--remove")
+        printRemove
+        ;;
+esac
