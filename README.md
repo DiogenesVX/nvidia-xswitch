@@ -9,14 +9,14 @@ It might as well run on your version/distribution.
 
 
 
-# key differences between nvidia-xswitch and nvidia-xrun
+# The key differences between nvidia-xswitch and nvidia-xrun
    1. no root required, all operations are done by the user without sudo
    2. no need to blacklist nvidia driver
    3. no need to load any additional modules, just install and run
 
 
 
-# usage
+# Usage
    1. install nvidia-xswitch: ./nvidia-xswitch --install
    2. Press Alt+Ctrl+F1 (switch to a free TTY)
    3. login
