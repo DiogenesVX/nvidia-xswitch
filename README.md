@@ -1,6 +1,6 @@
 # nvidia-xswitch
-The simple way to run a separate X with the discrete NVIDIA graphic card.
-This utility offers the possibility to run a separate X with discrete NVIDIA graphic card with full performance.
+The simple way to run a separate X with the discrete NVIDIA graphics card.
+This utility offers the possibility to run a separate X with discrete NVIDIA graphics card with full performance.
 This project was inspired by the nvidia-xrun project [Witko/nvidia-xrun](https://github.com/Witko/nvidia-xrun).
 The main goal of the nvidia-xswitch project is to make it as simple as possible and to make it work on Debian out of the box.
 The original nvidia-xrun utility is mainly designed to run on Arch and requires too much tweaking to make it work on Debian.
