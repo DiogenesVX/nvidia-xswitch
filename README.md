@@ -121,7 +121,8 @@ If you want to use any of the above sections after you installed nvidia-xswitch,
 
    2. Make sure you have NVIDIA driver properly installed.
     On Debian follow this guide: [wiki.debian.org](https://wiki.debian.org/NvidiaGraphicsDrivers)
-    In short, these are the standatd steps (tested on Debian Sid):
+    
+   In short, these are the standard steps (tested on Debian Sid):
     
            sudo nano /etc/apt/sources.list
            
